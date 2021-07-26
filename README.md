@@ -46,14 +46,6 @@ Before making any changes to your javascript code, you would need to integrate a
 
 # Finally, lets do some javascript
 
-## Import module
-
-First, import the module.
-
-```javascript
-import Roam from 'roam-reactnative';
-```
-
 ## Creating Users
 Once the SDK is initialized, we need to *create* or *get a user* to start the tracking and use other methods. Every user created will have a unique Roam identifier which will be used later to login and access developer APIs. We can call it as Roam userId.
 
