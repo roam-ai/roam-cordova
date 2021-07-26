@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Build;
 import android.provider.Settings;
 
@@ -12,6 +13,8 @@ import com.roam.sdk.Roam;
 import com.roam.sdk.RoamPublish;
 import com.roam.sdk.RoamTrackingMode;
 import com.roam.sdk.callback.RoamCallback;
+import com.roam.sdk.callback.RoamLocationCallback;
+import com.roam.sdk.callback.RoamLogoutCallback;
 import com.roam.sdk.models.RoamError;
 import com.roam.sdk.models.RoamUser;
 
