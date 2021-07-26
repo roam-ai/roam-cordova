@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin 
+    id="roam-cordova" 
+    version="0.0.1"
+	xmlns="http://apache.org/cordova/ns/plugins/1.0"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	<name>roam</name>
+	<js-module name="roam" src="www/roam.js">
+		<clobbers target="cordova.plugins.roam" />
+	</js-module>
+    <!-- Android Configuration -->
+	<platform name="android">
+		<config-file parent="/*" target="res/xml/config.xml">
+			<feature name="roam">
+				<param name="android-package" value="com.roam.cordova.CDVRoam" />
+			</feature>
+		</config-file>
+		<config-file parent="/*" target="AndroidManifest.xml">
+            <!--Network-->
+			<uses-permission android:name="android.permission.INTERNET" />
+    		<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    		<!--Location-->
+			<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+			<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+			<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+			<!--Restart-->
+			<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+			<!--Battery-->
+			<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+			<!--Storage-->
+			<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+			<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+			<uses-feature android:name="android.hardware.location.gps" />
+        </config-file>
+		<source-file src="src/android/CDVRoam.java" target-dir="src/com/roam/cordova/" />
+        <framework custom="true" src="src/android/roam-sdk.gradle" type="gradleReference" />
+	</platform>
+</plugin>
+
+
+
+
