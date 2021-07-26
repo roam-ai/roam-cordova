@@ -9,13 +9,6 @@ roam.isBatteryOptimizationEnabled = function(callback) {
      exec( callback, null, 'roam', "isBatteryOptimizationEnabled",[]);
 };
 
-roam.checkActivityPermission = function(callback) {
-     exec( callback, null, 'roam', "checkActivityPermission",[]);
-};
-
-roam.requestActivityPermission = function(callback) {
-     exec( callback, null, 'roam', "requestActivityPermission",[]);
-};
 
 roam.checkLocationPermission = function(callback) {
      exec( callback, null, 'roam', "checkLocationPermission",[]);
@@ -57,36 +50,32 @@ roam.getUser = function(userId, success, error) {
      exec( success, error, 'roam', "getUser",[userId]);
 };
 
-roam.toggleEvents = function(geofenceEvents,tripEvents, activityEvents, success, error) {
-     exec( success, error, 'roam', "toggleEvents",[geofenceEvents, tripEvents, activityEvents]);
+roam.subscribe = function(type, userId) {
+     exec( null, null, 'roam', "subscribe",[type, userId]);
+};
+
+roam.unSubscribe = function(utype, userId) {
+     exec( null, null, 'roam', "unSubscribe",[type, userId]);
+};
+
+roam.toggleEvents = function(geofenceEvents,tripEvents, locationEvents, movingGeofenceEvents, success, error) {
+     exec( success, error, 'roam', "toggleEvents",[geofenceEvents, tripEvents, locationEvents, movingGeofenceEvents]);
 };
 
 roam.getEventsStatus = function(success, error) {
      exec( success, error, 'roam', "getEventsStatus",[]);
 };
 
-roam.startTrip = function(tripId,tripDescription, success, error) {
-     exec( success, error, 'roam', "startTrip",[tripId, tripDescription]);
+roam.toggleListener = function(locations,events, success, error) {
+     exec( success, error, 'roam', "toggleListener",[locations, events]);
 };
 
-roam.resumeTrip = function(tripId, success, error) {
-     exec( success, error, 'roam', "resumeTrip",[tripId]);
+roam. getListenerStatus = function(success, error) {
+     exec( success, error, 'roam', "getListenerStatus",[]);
 };
 
-roam.pauseTrip = function(tripId, success, error) {
-     exec( success, error, 'roam', "pauseTrip",[tripId]);
-};
-
-roam.endTrip = function(tripId, success, error) {
-     exec( success, error, 'roam', "endTrip",[tripId]);
-};
-
-roam.activeTrips = function(success, error) {
-     exec( success, error, 'roam', "activeTrips",[]);
-};
-
-roam.getCurrentLocation = function(accuracy, success, error) {
-     exec( success, error, 'roam', "getCurrentLocation",[accuracy]);
+roam.getCurrentLocation = function(accuracy, desiredAccuracy, success, error) {
+     exec( success, error, 'roam', "getCurrentLocation",[accuracy, desiredAccuracy]);
 };
 
 roam.updateCurrentLocation = function(accuracy, desiredAccuracy) {
@@ -105,36 +94,16 @@ roam.stopTracking = function() {
      exec( null, null, 'roam', "stopTracking",[]);
 };
 
-roam.isLocationTracking = function(callback) {
-     exec( callback, null,'roam', "isLocationTracking",[]);
+roam.stopTracking = function() {
+     exec( null, null, 'roam', "stopTracking",[]);
+};
+
+roam.stopPublishing = function() {
+     exec( null, null, 'roam', "stopPublishing",[]);
 };
 
 roam.logout = function(success, error) {
      exec( success, error, 'roam', "logout",[]);
-};
-
-roam.setTrackingInAppState = function(jsonarray) {
-     exec( null, null, 'roam', "setTrackingInAppState",[jsonarray]);
-};
-
-roam.setTrackingInMotion = function(jsonarray) {
-     exec( null, null, 'roam', "setTrackingInMotion",[jsonarray]);
-};
-
-roam.onEvents = function(callback) {
-	exec( callback, null, 'roam', "onEvents", []);
-};
-
-roam.onError = function(callback) {
-	exec( callback, null, 'roam', "onError", []);
-};
-
-roam.offEvents = function() {
-	exec( null, null, 'roam', "offEvents", []);
-};
-
-roam.offError = function() {
-	exec( null, null, 'roam', "offError", []);
 };
 
 module.exports = roam;

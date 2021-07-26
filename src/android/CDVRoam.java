@@ -146,14 +146,27 @@ public class CDVRoam extends CordovaPlugin {
                 this.publishAndSave();
                 return true;
 
-           case "updateCurrentLocation":
-               int updateAccuracy = args.getInt(0);
-               String updateDesiredAccuracy = args.getString(1);
-               this.updateCurrentLocation(updateAccuracy, updateDesiredAccuracy);
-               return true;
-
+            case "updateCurrentLocation":
+                int updateAccuracy = args.getInt(0);
+                String updateDesiredAccuracy = args.getString(1);
+                this.updateCurrentLocation(updateAccuracy, updateDesiredAccuracy);
+                return true;
+ 
+             case "getCurrentLocation":
+                 int accuracy = args.getInt(0);
+                 String desired_Accuracy = args.getString(1);
+                 this.getCurrentLocation(accuracy, desired_Accuracy, callbackContext);
+                 return true;
             case "stopTracking":
                 this.stopTracking();
+                return true;
+
+            case "stopPublishing":
+                this.stopPublishing();
+                return true;      
+            
+            case "logout":
+                this.logout(callbackContext);
                 return true;
         }
         return false;
@@ -309,6 +322,48 @@ public class CDVRoam extends CordovaPlugin {
         });
     }
 
+    private void updateCurrentLocation(int accuracy, String desiredAccuracy) {
+        switch (desiredAccuracy) {
+            case "MEDIUM":
+                Roam.updateCurrentLocation(RoamTrackingMode.DesiredAccuracy.MEDIUM, accuracy);
+                break;
+            case "LOW":
+                Roam.updateCurrentLocation(RoamTrackingMode.DesiredAccuracy.LOW, accuracy);
+                break;
+            default:
+                Roam.updateCurrentLocation(RoamTrackingMode.DesiredAccuracy.HIGH, accuracy);
+                break;
+        }
+    }
+
+    public void getCurrentLocation(int accuracy, String desired_Accuracy, final CallbackContext callbackContext) {
+        RoamTrackingMode.DesiredAccuracy desiredAccuracy = null;
+        switch (desired_Accuracy) {
+            case "MEDIUM":
+                desiredAccuracy = RoamTrackingMode.DesiredAccuracy.MEDIUM;
+                break;
+            case "LOW":
+                desiredAccuracy = RoamTrackingMode.DesiredAccuracy.LOW;
+                break;
+            default:
+                desiredAccuracy = RoamTrackingMode.DesiredAccuracy.HIGH;
+                break;
+        }
+        Roam.getCurrentLocation(desiredAccuracy, accuracy, new RoamLocationCallback() {
+            @Override
+            public void location(Location location) {
+                String serializedLocation = new GsonBuilder().create().toJson(location);
+                callbackContext.success(serializedLocation);
+            }
+
+            @Override
+            public void onFailure(RoamError roamError) {
+                String serializedError = new GsonBuilder().create().toJson(roamError);
+                callbackContext.error(serializedError);
+            }
+        });
+    }
+
     private void subscribe(String type, String userId){
         switch (type) {
             case "EVENTS":
@@ -390,6 +445,25 @@ public class CDVRoam extends CordovaPlugin {
     public void publishAndSave() {
         RoamPublish roamPublish = new RoamPublish.Builder().build();
         Roam.publishAndSave(roamPublish);
+    }
+
+    public void stopPublishing() {
+        Roam.stopPublishing();
+    }
+
+    private void logout(final CallbackContext callbackContext) {
+        Roam.logout(new RoamLogoutCallback() {
+            @Override
+            public void onSuccess(String s) {
+                callbackContext.success(s);
+            }
+
+            @Override
+            public void onFailure(RoamError roamError) {
+                String serializedError = new GsonBuilder().create().toJson(roamError);
+                callbackContext.error(serializedError);
+            }
+        });
     }
 
     private static String enabledStatus(boolean hasEnabled) {
