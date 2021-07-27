@@ -50,6 +50,22 @@ roam.getUser = function(userId, success, error) {
      exec( success, error, 'roam', "getUser",[userId]);
 };
 
+roam.enableAccuracyEngine = function(accuracy) {
+     exec(null, null, 'roam', "enableAccuracyEngine",[accuracy]);
+};
+
+roam.disableAccuracyEngine = function() {
+     exec(null, null, 'roam', "disableAccuracyEngine",[]);
+};
+
+roam.offlineLocationTracking = function(value) {
+     exec(null, null, 'roam', "offlineLocationTracking",[value]);
+};
+
+roam.allowMockLocation = function(value) {
+     exec(null, null, 'roam', "allowMockLocation",[value]);
+};
+
 roam.subscribe = function(type, userId) {
      exec( null, null, 'roam', "subscribe",[type, userId]);
 };

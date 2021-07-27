@@ -128,24 +128,18 @@ cordova.plugins.roam.requestBackgroundLocationPermission(function(status){
 For enabling accuracy engine for Passive, Active, and Balanced tracking.
 
 ```javascript
-cordova.plugins.roam.enableAccuracyEngine(function(status){
-  // do something with status
-});
+cordova.plugins.roam.enableAccuracyEngine();
 ```
 
 For Custom tracking mores, you can pass the desired accuracy values in integers ranging from 25-150m.
 
 ```javascript
-cordova.plugins.roam.enableAccuracyEngine(function(accuray ,status){
-  // do something with status
-});
+cordova.plugins.roam.enableAccuracyEngine(function(accuray));
 ```
 To disable accuracy engine
 
 ```javascript
-cordova.plugins.roam.disableAccuracyEngine(function(accuray ,status){
-  // do something with status
-});
+cordova.plugins.roam.disableAccuracyEngine();
 ```
 
 #### Offline Location Tracking
@@ -153,9 +147,7 @@ cordova.plugins.roam.disableAccuracyEngine(function(accuray ,status){
 To modify the offline location tracking configuration, which will enabled by default. 
 
 ```javascript
-cordova.plugins.roam.offlineLocationTracking(function(accuray ,status){
-  // do something with status
-});
+cordova.plugins.roam.offlineLocationTracking(function(true));
 ```
 
 #### Allow Mock Location Tracking
@@ -163,9 +155,7 @@ cordova.plugins.roam.offlineLocationTracking(function(accuray ,status){
 To allow mock location tracking during development, use the below code. This will be disabled by default. 
 
 ```javascript
-cordova.plugins.roam.allowMockLocation(function(accuray ,status){
-  // do something with status
-});
+cordova.plugins.roam.allowMockLocation(function(true));
 ```
 
 ## Location Tracking
@@ -224,8 +214,6 @@ cordova.plugins.roam.startTrackingDistanceInterval("DISTANCE IN METERS", "STATIO
 cordova.plugins.roam.startTrackingTimeInterval("INTERVAL IN SECONDS", "ACCURACY");
 ```
 
-**Accuracy Values
-
 | **Accuracy**      | **Description** | 
 | ----------------- | --------------- | 
 | HIGH              | High Accuracy   | 
@@ -252,7 +240,7 @@ cordova.plugins.roam.publishAndSave(null);
 
 It will stop publishing the location data to other clients.
 ``` javascript
-cordova.plugins.roam.stopPublishing(null);
+cordova.plugins.roam.stopPublishing();
 ```
 
 ## Subscribe Messages

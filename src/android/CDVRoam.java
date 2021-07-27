@@ -96,6 +96,25 @@ public class CDVRoam extends CordovaPlugin {
                 this.getUser(userId, callbackContext);
                 return true;
 
+            case "enableAccuracyEngine":
+                int accuracyValue = args.getInt(0);
+                this.enableAccuracyEngine(accuracyValue);
+                return true;
+
+            case "disableAccuracyEngine":
+                this.disableAccuracyEngine();
+                return true;
+
+            case "offlineLocationTracking":
+                Boolean value = args.getBoolean(0);
+                this.offlineLocationTracking(value);
+                return true;
+
+            case "allowMockLocation":
+                Boolean mockValue = args.getBoolean(0);
+                this.allowMockLocation(mockValue);
+                return true;
+
             case "toggleEvents":
                 boolean geofenceEvents = args.getBoolean(0);
                 boolean tripEvents = args.getBoolean(1);
@@ -175,7 +194,7 @@ public class CDVRoam extends CordovaPlugin {
             case "onLocation":
                 this.onLocation(callbackContext);
                 return true;
-                
+
             case "onEvents":
                 this.onEvents(callbackContext);
                 return true;
@@ -186,8 +205,8 @@ public class CDVRoam extends CordovaPlugin {
 
             case "offLocation":
                 this.offLocation();
-                return true;    
-                
+                return true;
+
             case "offEvents":
                 this.offEvents();
                 return true;
@@ -282,6 +301,22 @@ public class CDVRoam extends CordovaPlugin {
                 callbackContext.error(serializedError);
             }
         });
+    }
+
+    private void enableAccuracyEngine(int accuracy) {
+        Roam.enableAccuracyEngine(accuracy);
+    }
+
+    private void disableAccuracyEngine() {
+        Roam.disableAccuracyEngine();
+    }
+
+    private void allowMockLocation(Boolean value) {
+        Roam.allowMockLocation(value);
+    }
+
+    private void offlineLocationTracking(Boolean value) {
+        Roam.offlineLocationTracking(value);
     }
 
     private void toggleEvents(boolean geofenceEvents, boolean tripEvents, boolean locationEvents, boolean movingGeofenceEvents, final CallbackContext callbackContext) {
@@ -496,7 +531,7 @@ public class CDVRoam extends CordovaPlugin {
     private void onLocation(final CallbackContext callbackContext) {
         locationCallbackContext = callbackContext;
     }
-    
+
     private void onEvents(final CallbackContext callbackContext) {
         eventsCallbackContext = callbackContext;
     }
@@ -529,7 +564,7 @@ public class CDVRoam extends CordovaPlugin {
             return "GRANTED";
         return "DENIED";
     }
-    
+
     public static class RoamCordovaReceiver extends RoamReceiver{
         @Override
         public void onLocationUpdated(Context context, RoamLocation roamLocation) {
