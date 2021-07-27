@@ -121,6 +121,161 @@ cordova.plugins.roam.requestBackgroundLocationPermission(function(status){
 });
 ```
 
+### SDK Configurations
+
+#### Accuracy Engine
+
+For enabling accuracy engine for Passive, Active, and Balanced tracking.
+
+```javascript
+cordova.plugins.roam.enableAccuracyEngine(function(status){
+  // do something with status
+});
+```
+
+For Custom tracking mores, you can pass the desired accuracy values in integers ranging from 25-150m.
+
+```javascript
+cordova.plugins.roam.enableAccuracyEngine(function(accuray ,status){
+  // do something with status
+});
+```
+To disable accuracy engine
+
+```javascript
+cordova.plugins.roam.disableAccuracyEngine(function(accuray ,status){
+  // do something with status
+});
+```
+
+#### Offline Location Tracking
+
+To modify the offline location tracking configuration, which will enabled by default. 
+
+```javascript
+cordova.plugins.roam.offlineLocationTracking(function(accuray ,status){
+  // do something with status
+});
+```
+
+#### Allow Mock Location Tracking
+
+To allow mock location tracking during development, use the below code. This will be disabled by default. 
+
+```javascript
+cordova.plugins.roam.allowMockLocation(function(accuray ,status){
+  // do something with status
+});
+```
+
+## Location Tracking
+
+### Start Tracking
+
+Use the tracking modes while you use the startTracking method `cordova.plugins.roam.startTracking()`
+
+```javascript
+cordova.plugins.roam.startTracking("TRACKING MODE");
+```
+
+### Tracking Modes
+
+Roam has three default tracking modes along with a custom version. They differ based on the frequency of location updates and battery consumption. The higher the frequency, the higher is the battery consumption. You must use [foreground service](https://developer.android.com/about/versions/oreo/background-location-limits) for continuous tracking.
+
+| **Mode** | **Battery usage** | **Updates every** | **Optimised for/advised for** |
+| -------- | ----------------- | ----------------- | ----------------------------- |
+| Active   | 6% - 12%          | 25 ~ 250 meters   | Ride Hailing / Sharing        |
+| Balanced | 3% - 6%           | 50 ~ 500 meters   | On Demand Services            |
+| Passive  | 0% - 1%           | 100 ~ 1000 meters | Social Apps                   |
+
+```javascript
+// active tracking
+cordova.plugins.roam.startTracking(ACTIVE);
+// balanced tracking
+cordova.plugins.roam.startTracking(BALANCED);
+// passive tracking
+cordova.plugins.roam.startTracking(PASSIVE);
+```
+
+### Custom Tracking Modes
+
+The SDK also allows you define a custom tracking mode that allows you to
+customize and build your own tracking modes.
+
+#### Android
+
+| **Type**          | **Unit** | **Unit Range** |
+| ----------------- | -------- | -------------- |
+| Distance Interval | Meters   | 1m ~ 2500m     |
+| Time Interval     | Seconds  | 10s ~ 10800s   |
+
+
+**Distance between location updates example code:**
+
+```javascript
+//Update location based on distance between locations.
+cordova.plugins.roam.startTrackingDistanceInterval("DISTANCE IN METERS", "STATIONARY DURATION IN SECONDS", "ACCURACY");
+```
+
+**Time between location updates example code:**
+
+```javascript
+//Update location based on time interval.
+cordova.plugins.roam.startTrackingTimeInterval("INTERVAL IN SECONDS", "ACCURACY");
+```
+
+**Accuracy Values
+
+| **Accuracy**      | **Description** | 
+| ----------------- | --------------- | 
+| HIGH              | High Accuracy   | 
+| MEDIUM            | Medium Accuracy | 
+| LOW               | Low Accuracy    | 
+
+## Stop Tracking
+
+To stop the tracking use the below method.
+
+```javascript
+cordova.plugins.roam.stopTracking();
+```
+
+## Publish Messages
+
+It will both publish location data and these data will be sent to Roam servers for further processing and data will be saved in our database servers.
+We will now have an option to send meta-data as a parameter along with location updates in the below json format. (upcomming feature)
+
+```javascript
+cordova.plugins.roam.publishAndSave(null);
+```
+## Stop Publishing
+
+It will stop publishing the location data to other clients.
+``` javascript
+cordova.plugins.roam.stopPublishing(null);
+```
+
+## Subscribe Messages
+
+Now that you have enabled the location listener, use the below method to subscribe to your own or other user's location updates and events.
+
+### Subscribe
+``` javascript
+cordova.plugins.roam.subscribe(TYPE, "USER-ID");
+```
+
+| **Type** | **Description**                                                                |
+| ---------|--------------------------------------------------------------------------------| 
+| LOCATION | Subscribe to your own location (or) other user's location updates.             |
+| EVENTS   | Subscribe to your own events.                                                  |
+| BOTH     | Subscribe to your own events and location (or) other user's location updates.  |
+
+
+### UnSubscribe
+``` javascript
+cordova.plugins.roam.unSubscribe(TYPE, "USER-ID");
+```
+
 ## Documentation
 
 Please visit our [Developer Center](https://github.com/roam-ai/roam-cordova/wiki) for instructions on other SDK methods.
