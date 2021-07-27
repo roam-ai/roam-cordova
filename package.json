@@ -1,17 +1,29 @@
 {
   "name": "roam-cordova",
   "version": "0.0.1",
-  "description": "",
+  "description": "This plugin allows to use the Roam.ai SDK in your React Native mobile application on iOS and Android.",
+  "homepage": "https://roam.ai",
+  "license": "MIT",
+  "author": "Roam B.V",
   "cordova": {
     "id": "roam-cordova",
     "platforms": [
       "android"
     ]
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/roam-ai/roam-cordova"
+  },
   "keywords": [
     "ecosystem:cordova",
-    "cordova-android"
-  ],
-  "author": "",
-  "license": "ISC"
+    "cordova-android",
+    "location",
+    "android",
+    "roam",
+    "sdk",
+    "ios",
+    "gps",
+    "tracking"
+  ]
 }
