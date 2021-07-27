@@ -276,6 +276,45 @@ cordova.plugins.roam.subscribe(TYPE, "USER-ID");
 cordova.plugins.roam.unSubscribe(TYPE, "USER-ID");
 ```
 
+## Listeners
+
+Now that the location tracking is set up, you can subscribe to locations and events and use the data locally on your device or send it directly to your own backend server.
+
+To do that, you need to set the location and event listener to `true` using the below method. By default the status will set to `false` and needs to be set to `true` in order to stream the location and events updates to the same device or other devices.
+
+```javascript
+cordova.plugins.roam.toggleListener(true, true,, function(success){
+  // do something on success
+}, function(error){
+  // do something on error
+});
+```
+Once the listener toggles are set to true, to listen to location updates, events and errors.
+
+```javascript
+cordova.plugins.roam.onLocation((location) => {
+  // do something on location received
+});
+
+cordova.plugins.roam.onEvents((events) => {
+  // do something on events received
+});
+
+cordova.plugins.roam.onError((error) => {
+  // do something on error
+});
+```
+
+Remove the listeners with below codes.
+
+```javascript
+cordova.plugins.roam.offLocation();
+
+cordova.plugins.roam.offEvents();
+
+cordova.plugins.roam.offError();
+```
+
 ## Documentation
 
 Please visit our [Developer Center](https://github.com/roam-ai/roam-cordova/wiki) for instructions on other SDK methods.
