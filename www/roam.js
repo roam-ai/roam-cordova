@@ -106,4 +106,28 @@ roam.logout = function(success, error) {
      exec( success, error, 'roam', "logout",[]);
 };
 
+roam.onLocation = function(callback) {
+	exec( callback, null, 'roam', "onLocation", []);
+};
+
+roam.onEvents = function(callback) {
+	exec( callback, null, 'roam', "onEvents", []);
+};
+
+roam.onError = function(callback) {
+	exec( callback, null, 'roam', "onError", []);
+};
+
+roam.offLocation = function() {
+	exec( null, null, 'roam', "offLocation", []);
+};
+
+roam.offEvents = function() {
+	exec( null, null, 'roam', "offEvents", []);
+};
+
+roam.offError = function() {
+	exec( null, null, 'roam', "offError", []);
+};
+
 module.exports = roam;

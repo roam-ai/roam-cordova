@@ -3,10 +3,13 @@ package com.roam.cordova;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.provider.Settings;
+
+import androidx.annotation.NonNull;
 
 import com.google.gson.GsonBuilder;
 import com.roam.sdk.Roam;
@@ -16,7 +19,11 @@ import com.roam.sdk.callback.RoamCallback;
 import com.roam.sdk.callback.RoamLocationCallback;
 import com.roam.sdk.callback.RoamLogoutCallback;
 import com.roam.sdk.models.RoamError;
+import com.roam.sdk.models.RoamLocation;
+import com.roam.sdk.models.RoamLocationReceived;
 import com.roam.sdk.models.RoamUser;
+import com.roam.sdk.models.events.RoamEvent;
+import com.roam.sdk.service.RoamReceiver;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -29,18 +36,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class CDVRoam extends CordovaPlugin {
+    private static CallbackContext locationCallbackContext;
     private static CallbackContext eventsCallbackContext;
     private static CallbackContext errorCallbackContext;
     private static CallbackContext permissionCallbackContext;
     private Activity context;
-
-    @Override
-    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
-        super.initialize(cordova, webView);
-        context = this.cordova.getActivity();
-        Application application = this.cordova.getActivity().getApplication();
-        Roam.initialize(application, "YOUR-PUBLISHABLE-KEY");
-    }
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -170,6 +170,30 @@ public class CDVRoam extends CordovaPlugin {
             
             case "logout":
                 this.logout(callbackContext);
+                return true;
+
+            case "onLocation":
+                this.onLocation(callbackContext);
+                return true;
+                
+            case "onEvents":
+                this.onEvents(callbackContext);
+                return true;
+
+            case "onError":
+                this.onError(callbackContext);
+                return true;
+
+            case "offLocation":
+                this.offLocation();
+                return true;    
+                
+            case "offEvents":
+                this.offEvents();
+                return true;
+
+            case "offError":
+                this.offError();
                 return true;
         }
         return false;
@@ -469,6 +493,30 @@ public class CDVRoam extends CordovaPlugin {
         });
     }
 
+    private void onLocation(final CallbackContext callbackContext) {
+        locationCallbackContext = callbackContext;
+    }
+    
+    private void onEvents(final CallbackContext callbackContext) {
+        eventsCallbackContext = callbackContext;
+    }
+
+    private void onError(final CallbackContext callbackContext) {
+        errorCallbackContext = callbackContext;
+    }
+
+    private void offLocation() {
+        locationCallbackContext = null;
+    }
+
+    private void offEvents() {
+        eventsCallbackContext = null;
+    }
+
+    private void offError() {
+        errorCallbackContext = null;
+    }
+
     private static String enabledStatus(boolean hasEnabled) {
         if (hasEnabled) {
             return "ENABLED";
@@ -480,5 +528,35 @@ public class CDVRoam extends CordovaPlugin {
         if (hasPermissionsGranted)
             return "GRANTED";
         return "DENIED";
+    }
+    
+    public static class RoamCordovaReceiver extends RoamReceiver{
+        @Override
+        public void onLocationUpdated(Context context, RoamLocation roamLocation) {
+            super.onLocationUpdated(context, roamLocation);
+            String serializedLocation = new GsonBuilder().create().toJson(roamLocation);
+            locationCallbackContext.success(serializedLocation);
+        }
+
+        @Override
+        public void onLocationReceived(Context context, RoamLocationReceived roamLocationReceived) {
+            super.onLocationReceived(context, roamLocationReceived);
+            String serializedLocation = new GsonBuilder().create().toJson(roamLocationReceived);
+            locationCallbackContext.success(serializedLocation);
+        }
+
+        @Override
+        public void onEventReceived(Context context, RoamEvent roamEvent) {
+            super.onEventReceived(context, roamEvent);
+            String serializedLocation = new GsonBuilder().create().toJson(roamEvent);
+            eventsCallbackContext.success(serializedLocation);
+        }
+
+        @Override
+        public void onError(Context context, RoamError roamError) {
+            super.onError(context, roamError);
+            String serializedLocation = new GsonBuilder().create().toJson(roamError);
+            errorCallbackContext.success(serializedLocation);
+        }
     }
 }
