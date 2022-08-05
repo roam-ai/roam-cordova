@@ -1,20 +1,35 @@
 <?xml version='1.0' encoding='utf-8'?>
 <plugin 
     id="roam-cordova" 
-    version="0.0.1"
+    version="0.0.2"
 	xmlns="http://apache.org/cordova/ns/plugins/1.0"
 	xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>roam</name>
 	<js-module name="roam" src="www/roam.js">
 		<clobbers target="cordova.plugins.roam" />
 	</js-module>
-    <!-- Android Configuration -->
+
+
+	<!-- Android Configuration -->
 	<platform name="android">
-		<config-file parent="/*" target="res/xml/config.xml">
-			<feature name="roam">
-				<param name="android-package" value="com.roam.cordova.CDVRoam" />
-			</feature>
-		</config-file>
+		<config-file target="res/xml/config.xml" parent="/*">
+            <feature name="roam">
+                <param name="android-package" value="com.roam.cordova.CDVRoam"/>
+            </feature>
+        </config-file>
+		<config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <service android:name="com.roam.cordova.RoamCDVService" android:foregroundServiceType="location"/>
+        </config-file>
+		<config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <receiver
+                    android:name="com.roam.cordova.CDVRoam$RoamCordovaReceiver"
+                    android:enabled="true"
+                    android:exported="false">
+                <intent-filter>
+                    <action android:name="com.roam.android.RECEIVED" />
+                </intent-filter>
+            </receiver>
+        </config-file>
 		<config-file parent="/*" target="AndroidManifest.xml">
             <!--Network-->
 			<uses-permission android:name="android.permission.INTERNET" />
@@ -23,6 +38,8 @@
 			<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 			<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 			<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+			<!-- Service -->
+			<uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 			<!--Restart-->
 			<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 			<!--Battery-->
@@ -32,10 +49,16 @@
 			<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 			<uses-feature android:name="android.hardware.location.gps" />
         </config-file>
-		<source-file src="src/android/CDVRoam.java" target-dir="src/com/roam/cordova/" />
-        <framework custom="true" src="src/android/roam-sdk.gradle" type="gradleReference" />
+		<source-file src="src/android/src/main/java/com/roam/cordova/CDVRoam.java" target-dir="src/com/roam/cordova/" />
+		<source-file src="src/android/src/main/java/com/roam/cordova/RoamCDVService.java" target-dir="src/com/roam/cordova"/>
+		<framework custom="true" src="src/android/src/main/java/com/roam/cordova/roam-sdk.gradle" type="gradleReference" />
 	</platform>
-</plugin>
+
+
+
+
+    <!-- Android Configuration -->
+	</plugin>
 
 
 

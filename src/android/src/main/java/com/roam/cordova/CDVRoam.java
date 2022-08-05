@@ -1,15 +1,11 @@
 package com.roam.cordova;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.os.Build;
-import android.provider.Settings;
 
-import androidx.annotation.NonNull;
+import android.util.Log;
 
 import com.google.gson.GsonBuilder;
 import com.roam.sdk.Roam;
@@ -26,21 +22,16 @@ import com.roam.sdk.models.events.RoamEvent;
 import com.roam.sdk.service.RoamReceiver;
 
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 
-import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class CDVRoam extends CordovaPlugin {
     private static CallbackContext locationCallbackContext;
     private static CallbackContext eventsCallbackContext;
     private static CallbackContext errorCallbackContext;
-    private static CallbackContext permissionCallbackContext;
-    private Activity context;
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -58,7 +49,7 @@ public class CDVRoam extends CordovaPlugin {
                 return true;
 
             case "requestLocationPermission":
-                this.requestLocationPermission(callbackContext);
+                this.requestLocationPermission();
                 return true;
 
             case "checkLocationServices":
@@ -66,7 +57,7 @@ public class CDVRoam extends CordovaPlugin {
                 return true;
 
             case "requestLocationServices":
-                this.requestLocationServices(callbackContext);
+                this.requestLocationServices();
                 return true;
 
             case "checkBackgroundLocationPermission":
@@ -74,7 +65,7 @@ public class CDVRoam extends CordovaPlugin {
                 return true;
 
             case "requestBackgroundLocationPermission":
-                this.requestBackgroundLocationPermission(callbackContext);
+                this.requestBackgroundLocationPermission();
                 return true;
 
             case "getDeviceToken":
@@ -123,6 +114,15 @@ public class CDVRoam extends CordovaPlugin {
                 this.toggleEvents(geofenceEvents, tripEvents, locationEvents, movingGeofenceEvents, callbackContext);
                 return true;
 
+            case "setForegroundNotification":
+                boolean enabled = args.getBoolean(0);
+                String notificationTitle = args.getString(1);
+                String notificationDescription = args.getString(2);
+                String notificationIcon = args.getString(3);
+                String notificationActivity = args.getString(4);
+                this.setForegroundNotification(enabled, notificationTitle, notificationDescription, notificationIcon, notificationActivity);
+                return true;
+
             case "getEventsStatus":
                 this.getEventsStatus(callbackContext);
                 return true;
@@ -161,7 +161,7 @@ public class CDVRoam extends CordovaPlugin {
             case "startTrackingDistanceInterval":
                 int distance = args.getInt(0);
                 int stationary = args.getInt(1);
-                String dDesiredAccuracy = args.getString(3);
+                String dDesiredAccuracy = args.getString(2);
                 this.startTrackingDistanceInterval(distance, stationary, dDesiredAccuracy);
 
             case "publishAndSave":
@@ -232,10 +232,8 @@ public class CDVRoam extends CordovaPlugin {
         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, status));
     }
 
-    private void requestLocationPermission(CallbackContext callbackContext) {
-        permissionCallbackContext = callbackContext;
-        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
-        cordova.requestPermissions(this, Roam.REQUEST_CODE_LOCATION_PERMISSION, permissions);
+    private void requestLocationPermission() {
+        Roam.requestLocationPermission(cordova.getActivity());
     }
 
     private void checkLocationServices(CallbackContext callbackContext) {
@@ -243,9 +241,8 @@ public class CDVRoam extends CordovaPlugin {
         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, status));
     }
 
-    private void requestLocationServices(CallbackContext callbackContext) {
-        permissionCallbackContext = callbackContext;
-        cordova.startActivityForResult(this, new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), Roam.REQUEST_CODE_LOCATION_ENABLED);
+    private void requestLocationServices() {
+        Roam.requestLocationServices(cordova.getActivity());
     }
 
     private void checkBackgroundLocationPermission(CallbackContext callbackContext) {
@@ -253,22 +250,34 @@ public class CDVRoam extends CordovaPlugin {
         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, status));
     }
 
-    private void requestBackgroundLocationPermission(CallbackContext callbackContext) {
-        permissionCallbackContext = callbackContext;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            String[] permissions = {Manifest.permission.ACCESS_BACKGROUND_LOCATION};
-            cordova.requestPermissions(this, Roam.REQUEST_CODE_BACKGROUND_LOCATION_PERMISSION, permissions);
-        } else {
-            permissionCallbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, "UNKNOWN"));
-        }
+    private void requestBackgroundLocationPermission() {
+        Roam.requestBackgroundLocationPermission(cordova.getActivity());
     }
 
     private void getDeviceToken(CallbackContext callbackContext) {
         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, Roam.getDeviceToken()));
     }
 
+    private void setForegroundNotification(boolean enabled, String title, String description, String image, String activity){
+        Log.e("TAG", "setForegroundNotification: " + enabled + title + description + image + activity);
+        try{
+            String[] split = image.split("/");
+            String firstSubString = split[0];
+            String secondSubString = split[1];
+            int resId = cordova.getActivity().getResources()
+                    .getIdentifier(
+                            secondSubString,
+                            firstSubString,
+                            cordova.getActivity().getPackageName()
+                    );
+            Roam.setForegroundNotification(enabled, title, description, resId, activity);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     private void createUser(String description, final CallbackContext callbackContext) {
-        Roam.createUser(description, new RoamCallback() {
+        Roam.createUser(description,null, new RoamCallback() {
             @Override
             public void onSuccess(RoamUser roamUser) {
                 String serializedUser = new GsonBuilder().create().toJson(roamUser);
@@ -387,13 +396,13 @@ public class CDVRoam extends CordovaPlugin {
     private void updateCurrentLocation(int accuracy, String desiredAccuracy) {
         switch (desiredAccuracy) {
             case "MEDIUM":
-                Roam.updateCurrentLocation(RoamTrackingMode.DesiredAccuracy.MEDIUM, accuracy);
+                Roam.updateCurrentLocation(RoamTrackingMode.DesiredAccuracy.MEDIUM, accuracy, null);
                 break;
             case "LOW":
-                Roam.updateCurrentLocation(RoamTrackingMode.DesiredAccuracy.LOW, accuracy);
+                Roam.updateCurrentLocation(RoamTrackingMode.DesiredAccuracy.LOW, accuracy, null);
                 break;
             default:
-                Roam.updateCurrentLocation(RoamTrackingMode.DesiredAccuracy.HIGH, accuracy);
+                Roam.updateCurrentLocation(RoamTrackingMode.DesiredAccuracy.HIGH, accuracy, null);
                 break;
         }
     }
@@ -458,14 +467,27 @@ public class CDVRoam extends CordovaPlugin {
         switch (trackingMode) {
             case "ACTIVE":
                 Roam.startTracking(RoamTrackingMode.ACTIVE);
+                startReceiverService();
                 break;
             case "BALANCED":
                 Roam.startTracking(RoamTrackingMode.BALANCED);
+                startReceiverService();
                 break;
             case "PASSIVE":
                 Roam.startTracking(RoamTrackingMode.PASSIVE);
+                startReceiverService();
                 break;
         }
+    }
+
+    private void startReceiverService(){
+        Activity activity = cordova.getActivity();
+        activity.startService(new Intent(activity, RoamCDVService.class));
+    }
+
+    private void stopReceiverService(){
+        Activity activity = cordova.getActivity();
+        activity.stopService(new Intent(activity, RoamCDVService.class));
     }
 
     private void startTrackingTimeInterval(int timeInterval, String desiredAccuracy) {
@@ -482,6 +504,7 @@ public class CDVRoam extends CordovaPlugin {
                 break;
         }
         Roam.startTracking(builder.build());
+        startReceiverService();
     }
 
     private void startTrackingDistanceInterval(int distance, int stationary, String desiredAccuracy) {
@@ -498,11 +521,14 @@ public class CDVRoam extends CordovaPlugin {
                 break;
         }
         Roam.startTracking(builder.build());
+        startReceiverService();
     }
 
     private void stopTracking() {
         Roam.stopTracking();
+        stopReceiverService();
     }
+
 
     public void publishAndSave() {
         RoamPublish roamPublish = new RoamPublish.Builder().build();

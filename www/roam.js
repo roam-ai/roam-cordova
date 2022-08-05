@@ -14,24 +14,24 @@ roam.checkLocationPermission = function(callback) {
      exec( callback, null, 'roam', "checkLocationPermission",[]);
 };
 
-roam.requestLocationPermission = function(callback) {
-     exec( callback, null, 'roam', "requestLocationPermission",[]);
+roam.requestLocationPermission = function() {
+     exec( null, null, 'roam', "requestLocationPermission",[]);
 };
 
 roam.checkLocationServices = function(callback) {
      exec( callback, null, 'roam', "checkLocationServices",[]);
 };
 
-roam.requestLocationServices = function(callback) {
-     exec( callback, null, 'roam', "requestLocationServices",[]);
+roam.requestLocationServices = function() {
+     exec( null, null, 'roam', "requestLocationServices",[]);
 };
 
 roam.checkBackgroundLocationPermission = function(callback) {
      exec( callback, null, 'roam', "checkBackgroundLocationPermission",[]);
 };
 
-roam.requestBackgroundLocationPermission = function(callback) {
-     exec( callback, null, 'roam', "requestBackgroundLocationPermission",[]);
+roam.requestBackgroundLocationPermission = function() {
+     exec( null, null, 'roam', "requestBackgroundLocationPermission",[]);
 };
 
 roam.getDeviceToken = function(callback) {
@@ -41,6 +41,12 @@ roam.getDeviceToken = function(callback) {
 roam.createUser = function(description, success, error) {
      exec( success, error, 'roam', "createUser",[description]);
 };
+
+roam.setForegroundNotification = function(enabled, title, description, icon, activity){
+     exec( null, null, 'roam', "setForegroundNotification",[enabled, title, description, icon, activity]);
+}
+
+
 
 roam.setDescription = function(description, success, error) {
      exec( success, error, 'roam', "setDescription",[description]);
@@ -101,6 +107,14 @@ roam.updateCurrentLocation = function(accuracy, desiredAccuracy) {
 roam.startTracking = function(trackingMode) {
      exec( null, null, 'roam', "startTracking",[trackingMode]);
 };
+
+roam.startTrackingTimeInterval = function(timeInterval, desiredAccuracy){
+     exec( null, null, 'roam', "startTrackingTimeInterval",[timeInterval, desiredAccuracy]);
+}
+
+roam.startTrackingDistanceInterval = function(distance, stationary, desiredAccuracy){
+     exec( null, null, 'roam', "startTrackingDistanceInterval",[distance, stationary, desiredAccuracy]);
+}
 
 roam.publishAndSave = function() {
     exec( null, null, 'roam', "publishAndSave",[]);

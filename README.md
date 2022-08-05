@@ -271,7 +271,7 @@ Now that the location tracking is set up, you can subscribe to locations and eve
 To do that, you need to set the location and event listener to `true` using the below method. By default the status will set to `false` and needs to be set to `true` in order to stream the location and events updates to the same device or other devices.
 
 ```javascript
-cordova.plugins.roam.toggleListener(true, true,, function(success){
+cordova.plugins.roam.toggleListener(true, true, function(success){
   // do something on success
 }, function(error){
   // do something on error
@@ -301,6 +301,14 @@ cordova.plugins.roam.offLocation();
 cordova.plugins.roam.offEvents();
 
 cordova.plugins.roam.offError();
+```
+
+## Set Foreground Notification
+
+To set foreground notification, use the below method.
+
+```javascript
+cordova.plugins.roam.setForegroundNotification(boolean, "title", "description", "icon", "activity_path")
 ```
 
 ## Documentation
