@@ -303,6 +303,9 @@ cordova.plugins.roam.offEvents();
 cordova.plugins.roam.offError();
 ```
 
+***NOTE***
+`safeRemoveCallback` should be called in `onDestory` method of MainActivity to prevent terminated state crash.
+
 ## Set Foreground Notification
 
 To set foreground notification, use the below method.

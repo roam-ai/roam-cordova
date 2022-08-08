@@ -9,3 +9,8 @@
 - Fixed time and distance based tracking methods
 - Fixed location listener
 - Fixed `requestLocationPermission` and `requestBackgroundLocationPermission` methods
+
+## 0.0.3
+
+- Fixed location listener
+- Added `safeRemoveCallback` method to prevent app side crash for terminated state
