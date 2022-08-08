@@ -303,6 +303,14 @@ cordova.plugins.roam.offEvents();
 cordova.plugins.roam.offError();
 ```
 
+## Headless JS
+
+Headless JS allows JS code to run in isolate when app is terminated. Cordova doesn't have a mechanism for headless JS. To use location updates for terminated state, business logic can be added in `onLocationUpdated` method in `RoamCordovaReceiver` class in `CDVROAM.java`
+
+***NOTE***
+
+`safeRemoveCallback` should be called in `onDestory` method of MainActivity to prevent terminated state crash.
+
 ## Set Foreground Notification
 
 To set foreground notification, use the below method.

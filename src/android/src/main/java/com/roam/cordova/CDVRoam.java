@@ -555,7 +555,7 @@ public class CDVRoam extends CordovaPlugin {
     }
 
     private void onLocation(final CallbackContext callbackContext) {
-        locationCallbackContext = callbackContext;
+        CDVRoam.locationCallbackContext = callbackContext;
     }
 
     private void onEvents(final CallbackContext callbackContext) {
@@ -567,7 +567,7 @@ public class CDVRoam extends CordovaPlugin {
     }
 
     private void offLocation() {
-        locationCallbackContext = null;
+        CDVRoam.locationCallbackContext = null;
     }
 
     private void offEvents() {
@@ -591,19 +591,31 @@ public class CDVRoam extends CordovaPlugin {
         return "DENIED";
     }
 
+    public static void safeRemoveCallback(){
+        CDVRoam.locationCallbackContext = null;
+    }
+
     public static class RoamCordovaReceiver extends RoamReceiver{
         @Override
         public void onLocationUpdated(Context context, RoamLocation roamLocation) {
             super.onLocationUpdated(context, roamLocation);
             String serializedLocation = new GsonBuilder().create().toJson(roamLocation);
-            locationCallbackContext.success(serializedLocation);
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, serializedLocation);
+            pluginResult.setKeepCallback(true);
+            if (CDVRoam.locationCallbackContext != null) {
+                CDVRoam.locationCallbackContext.sendPluginResult(pluginResult);
+            } else {
+                //Business logic can be added here for terminated state
+                //safeRemoveCallback should be called in the MainActivity
+            }
+            
         }
 
         @Override
         public void onLocationReceived(Context context, RoamLocationReceived roamLocationReceived) {
             super.onLocationReceived(context, roamLocationReceived);
             String serializedLocation = new GsonBuilder().create().toJson(roamLocationReceived);
-            locationCallbackContext.success(serializedLocation);
+            CDVRoam.locationCallbackContext.success(serializedLocation);
         }
 
         @Override
