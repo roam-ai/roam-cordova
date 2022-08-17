@@ -14,3 +14,7 @@
 
 - Fixed location listener
 - Added `safeRemoveCallback` method to prevent app side crash for terminated state
+
+## 0.0.4
+
+- Fixed location object in the location receiver.

@@ -27,6 +27,7 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class CDVRoam extends CordovaPlugin {
     private static CallbackContext locationCallbackContext;
@@ -599,7 +600,27 @@ public class CDVRoam extends CordovaPlugin {
         @Override
         public void onLocationUpdated(Context context, RoamLocation roamLocation) {
             super.onLocationUpdated(context, roamLocation);
-            String serializedLocation = new GsonBuilder().create().toJson(roamLocation);
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("userId", roamLocation.getUserId());
+                jsonObject.put("activity", roamLocation.getActivity());
+                jsonObject.put("recordedAt", roamLocation.getRecordedAt());
+                jsonObject.put("timezoneOffset", roamLocation.getTimezoneOffset());
+                jsonObject.put("metadata", (roamLocation.getMetadata() != null) ? roamLocation.getMetadata().toString() : "");
+                jsonObject.put("batteryStatus", roamLocation.getBatteryStatus());
+                jsonObject.put("networkStatus", roamLocation.getNetworkStatus());
+                jsonObject.put("provider", roamLocation.getLocation().getProvider());
+                jsonObject.put("time", roamLocation.getLocation().getTime());
+                jsonObject.put("latitude", roamLocation.getLocation().getLatitude());
+                jsonObject.put("longitude", roamLocation.getLocation().getLongitude());
+                jsonObject.put("altitude", roamLocation.getLocation().getAltitude());
+                jsonObject.put("speed", roamLocation.getLocation().getSpeed());
+                jsonObject.put("bearing", roamLocation.getLocation().getBearing());
+                jsonObject.put("accuracy", roamLocation.getLocation().getAccuracy());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            String serializedLocation = jsonObject.toString();
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, serializedLocation);
             pluginResult.setKeepCallback(true);
             if (CDVRoam.locationCallbackContext != null) {
