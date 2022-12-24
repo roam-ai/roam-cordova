@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.gson.GsonBuilder;
@@ -28,6 +29,8 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 public class CDVRoam extends CordovaPlugin {
     private static CallbackContext locationCallbackContext;
@@ -260,7 +263,6 @@ public class CDVRoam extends CordovaPlugin {
     }
 
     private void setForegroundNotification(boolean enabled, String title, String description, String image, String activity){
-        Log.e("TAG", "setForegroundNotification: " + enabled + title + description + image + activity);
         try{
             String[] split = image.split("/");
             String firstSubString = split[0];
@@ -271,7 +273,7 @@ public class CDVRoam extends CordovaPlugin {
                             firstSubString,
                             cordova.getActivity().getPackageName()
                     );
-            Roam.setForegroundNotification(enabled, title, description, resId, activity);
+            Roam.setForegroundNotification(enabled, title, description, resId, activity, "com.roam.cordova.RoamCDVService");
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -294,7 +296,7 @@ public class CDVRoam extends CordovaPlugin {
     }
 
     private void setDescription(String description) {
-        Roam.setDescription(description);
+        Roam.setDescription(description, null);
     }
 
     private void getUser(String userId, final CallbackContext callbackContext) {
@@ -423,7 +425,7 @@ public class CDVRoam extends CordovaPlugin {
         }
         Roam.getCurrentLocation(desiredAccuracy, accuracy, new RoamLocationCallback() {
             @Override
-            public void location(Location location) {
+            public void location(Location location, float direction) {
                 String serializedLocation = new GsonBuilder().create().toJson(location);
                 callbackContext.success(serializedLocation);
             }
@@ -468,28 +470,16 @@ public class CDVRoam extends CordovaPlugin {
         switch (trackingMode) {
             case "ACTIVE":
                 Roam.startTracking(RoamTrackingMode.ACTIVE);
-                startReceiverService();
                 break;
             case "BALANCED":
                 Roam.startTracking(RoamTrackingMode.BALANCED);
-                startReceiverService();
                 break;
             case "PASSIVE":
                 Roam.startTracking(RoamTrackingMode.PASSIVE);
-                startReceiverService();
                 break;
         }
     }
 
-    private void startReceiverService(){
-        Activity activity = cordova.getActivity();
-        activity.startService(new Intent(activity, RoamCDVService.class));
-    }
-
-    private void stopReceiverService(){
-        Activity activity = cordova.getActivity();
-        activity.stopService(new Intent(activity, RoamCDVService.class));
-    }
 
     private void startTrackingTimeInterval(int timeInterval, String desiredAccuracy) {
         RoamTrackingMode.Builder builder = new RoamTrackingMode.Builder(timeInterval);
@@ -505,7 +495,6 @@ public class CDVRoam extends CordovaPlugin {
                 break;
         }
         Roam.startTracking(builder.build());
-        startReceiverService();
     }
 
     private void startTrackingDistanceInterval(int distance, int stationary, String desiredAccuracy) {
@@ -522,12 +511,10 @@ public class CDVRoam extends CordovaPlugin {
                 break;
         }
         Roam.startTracking(builder.build());
-        startReceiverService();
     }
 
     private void stopTracking() {
         Roam.stopTracking();
-        stopReceiverService();
     }
 
 
@@ -598,29 +585,14 @@ public class CDVRoam extends CordovaPlugin {
 
     public static class RoamCordovaReceiver extends RoamReceiver{
         @Override
-        public void onLocationUpdated(Context context, RoamLocation roamLocation) {
+        public void onLocationUpdated(Context context, List<RoamLocation> roamLocation) {
             super.onLocationUpdated(context, roamLocation);
-            JSONObject jsonObject = new JSONObject();
+            String serializedLocation = "";
             try {
-                jsonObject.put("userId", roamLocation.getUserId());
-                jsonObject.put("activity", roamLocation.getActivity());
-                jsonObject.put("recordedAt", roamLocation.getRecordedAt());
-                jsonObject.put("timezoneOffset", roamLocation.getTimezoneOffset());
-                jsonObject.put("metadata", (roamLocation.getMetadata() != null) ? roamLocation.getMetadata().toString() : "");
-                jsonObject.put("batteryStatus", roamLocation.getBatteryStatus());
-                jsonObject.put("networkStatus", roamLocation.getNetworkStatus());
-                jsonObject.put("provider", roamLocation.getLocation().getProvider());
-                jsonObject.put("time", roamLocation.getLocation().getTime());
-                jsonObject.put("latitude", roamLocation.getLocation().getLatitude());
-                jsonObject.put("longitude", roamLocation.getLocation().getLongitude());
-                jsonObject.put("altitude", roamLocation.getLocation().getAltitude());
-                jsonObject.put("speed", roamLocation.getLocation().getSpeed());
-                jsonObject.put("bearing", roamLocation.getLocation().getBearing());
-                jsonObject.put("accuracy", roamLocation.getLocation().getAccuracy());
-            }catch (Exception e){
+                serializedLocation = mapForLocationList(roamLocation).toString();
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
-            String serializedLocation = jsonObject.toString();
             PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, serializedLocation);
             pluginResult.setKeepCallback(true);
             if (CDVRoam.locationCallbackContext != null) {
@@ -652,5 +624,40 @@ public class CDVRoam extends CordovaPlugin {
             String serializedLocation = new GsonBuilder().create().toJson(roamError);
             errorCallbackContext.success(serializedLocation);
         }
+
+        private JSONArray mapForLocationList(List<RoamLocation> locationList) throws JSONException {
+            JSONArray array = new JSONArray();
+            for (RoamLocation roamLocation: locationList){
+                JSONObject map = new JSONObject();
+                map.put("userId", (roamLocation.getUserId() != null) ? roamLocation.getUserId() : "");
+                map.put("location", mapForLocation(roamLocation.getLocation()));
+                if (TextUtils.isEmpty(roamLocation.getActivity())) {
+                    map.put("activity", " ");
+                } else {
+                    map.put("activity", roamLocation.getActivity());
+                }
+                map.put("recordedAt", roamLocation.getRecordedAt());
+                map.put("timezone", roamLocation.getTimezoneOffset());
+                array.put(map);
+            }
+            return array;
+        }
+
+        private JSONObject mapForLocation(Location location){
+            JSONObject map = new JSONObject();
+            if (location == null) {
+                return map;
+            }
+            try {
+                map.put("latitude", location.getLatitude());
+                map.put("longitude", location.getLongitude());
+                map.put("accuracy", location.getAccuracy());
+                map.put("altitude", location.getAltitude());
+                map.put("speed", location.getSpeed());
+            } catch (JSONException e) {
+            }
+            return map;
+        }
+
     }
 }
