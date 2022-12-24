@@ -18,3 +18,8 @@
 ## 0.0.4
 
 - Fixed location object in the location receiver.
+
+## 0.0.5
+
+- Updated Android SDK v0.1.7
+- Fixed location receiver output
