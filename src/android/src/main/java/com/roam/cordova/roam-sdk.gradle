@@ -5,5 +5,5 @@ repositories {
     }
 }
 dependencies {
-    implementation 'com.roam.sdk:roam-android:0.1.7'
+    implementation 'com.roam.sdk:roam-android:0.1.19'
 }
